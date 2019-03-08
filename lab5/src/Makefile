@@ -1,12 +1,13 @@
 CC=gcc
 DEPS = costs.h receiver.h
 CFLAGS = -Wall -std=c99 -pthread -Wno-missing-braces
+OBJ = main.o costs.o receiver.o updater.o sender.o logger.o machine.o
 
 default: main
 
 # linking
-main: main.o costs.o receiver.o updater.o sender.o logger.o machine.o
-	$(CC) $(CFLAGS) -o main main.o costs.o receiver.o updater.o sender.o logger.o machine.o
+main: $(OBJ)
+	$(CC) $(CFLAGS) -o main $(OBJ)
 
 # compiling
 main.o: main.c receiver.h updater.h machine.h

@@ -67,3 +67,31 @@ void print_machines(Machine* machines) {
             machines[i].port);
     }
 }
+
+/**
+ * @brief Determines if a node is a neighbor to the current machine
+ * 
+ * @param cfg      Configuration
+ * @return size_t* array of neighbor ids
+ */
+size_t* get_neighbors(Config* cfg) {
+    size_t* neighbors = (size_t*) malloc(4 * sizeof(size_t));
+    size_t neighbors_i = 0;
+
+    size_t** table = lock_table(cfg->costs);
+    int curr_id = cfg->machine->id;
+
+    for (int i = 0; i < 4; ++i) {
+        // not neighbor
+        if (table[i][curr_id] >= 100) {
+            continue;
+        }
+
+        // append neighbor
+        neighbors[neighbors_i] = i;
+    }
+    unlock_table(cfg->costs);
+
+    return neighbors;
+}
+

@@ -3,7 +3,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#include "cost.h"
+#include "costs.h"
 #include "sender.h"
 #include "logger.h"
 #include "machine.h"
@@ -32,16 +32,30 @@ void read_changes(Config* cfg) {
 
         log_info("updating machine %d <-> %d with new cost %d",
             cfg->machine->id, target, new_cost);
-        
-        // create message format
-        int msg[] = {cfg->machine->id, target, new_cost};
-        update_costs(cfg->costs, msg);
-        
-        send_costs(cfg, msg);
+
+        // source, start at hop count 0
+        // (increments in receive_update so start at -1 here)
+        cfg->costs->hop_count = -1;
+        receive_update(cfg, cfg->costs);
     }
 
     // sleep for another 30 seconds ?
     sleep(30);
+}
+
+
+void receive_update(Config* cfg, CostTable* cost_table) {
+
+    // check if hop limit exceeded
+    if (cfg->costs->hop_count > 8) {
+        return;
+    }
+
+    // increase hop count
+    cfg->costs->hop_count += 1;
+    // update_costs(cfg->costs, cfg->costs);
+    
+    send_costs(cfg, cfg->costs);
 }
 
 /**
@@ -51,7 +65,7 @@ void read_changes(Config* cfg) {
  * @param msg    Message to send
  * @return int   1 if success, 0 if fail
  */
-int send_cost(Machine* target, int* msg) {
+int send_cost(Machine* target, CostTable* cost_table) {
     int sock;
     struct sockaddr_in serverAddr;
     socklen_t addr_size;
@@ -65,19 +79,18 @@ int send_cost(Machine* target, int* msg) {
 
     // create udp socket
     if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-        log_error("socket error sending [%d %d %d]",
-            msg[0], msg[1], msg[2]);
+        log_error("socket error sending to machine #%d (hop count %d)",
+            target->id, cost_table->hop_count);
         return 0;
     }
 
-    log_info("sending message [%d %d %d] to %d",
-        msg[0], msg[1], msg[2], target->id);
+    log_info("sending message to machine #%d (hop count %d)",
+        target->id, cost_table->hop_count);
 
-    // message size is 3 * int
-    if (sendto(sock, msg, 3 * sizeof(int), 0,
+    if (sendto(sock, cost_table, sizeof(CostTable), 0,
         (struct sockaddr*) &serverAddr, addr_size) == -1) {
-            log_error("failed sending [%d %d %d]",
-                msg[0], msg[1], msg[2]);
+            log_error("failed sending message to machine %d (hop count %d)",
+                target->id, cost_table->hop_count);
             return 0;
     }
 
@@ -88,9 +101,9 @@ int send_cost(Machine* target, int* msg) {
  * @brief Sends a cost update message to all other nodes
  * 
  * @param cfg Configuration with machine data
- * @param msg Message to send
+ * @param cost_table Message to send
  */
-void send_costs(Config* cfg, int* msg) {
+void send_costs(Config* cfg, CostTable* cost_table) {
 
     // TODO: costs should only send table to neighbor nodes
     // use received costtable's hop count + 1
@@ -104,6 +117,15 @@ void send_costs(Config* cfg, int* msg) {
             continue;
         }
 
-        send_cost(&machines[i], msg);
+        size_t** table = lock_table(cost_table);
+        // skip machines that aren't neighbors
+        if (table[i][curr_id] >= 100) {
+            continue;
+        }
+
+        send_cost(&machines[i], cost_table);
+
+        // unlock after sending
+        unlock_table(cost_table);
     }
 }

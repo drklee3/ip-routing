@@ -21,7 +21,7 @@ typedef struct {
 size_t** parse_costs(FILE* fp);
 CostTable* create_cost_table(FILE* fp, pthread_mutex_t* lock);
 void print_costs(CostTable* tbl);
-void update_costs(CostTable* tbl, int* msg);
+void update_costs(CostTable* tbl, CostTable* msg);
 int* get_least_costs(CostTable* tbl, int start);
 void print_array(int* arr, int size);
 

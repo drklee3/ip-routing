@@ -118,22 +118,23 @@ void print_costs(CostTable* tbl) {
  * @param tbl CostTable
  * @param msg Message from another node as [machine1, machine2, cost]
  */
-void update_costs(CostTable* tbl, int* msg) {
+void update_costs(CostTable* tbl, CostTable* msg) {
     // reassign to variables to make more clear
-    int x    = msg[0];
-    int y    = msg[1];
-    int cost = msg[2];
 
     // TODO: message is cost table of neighbors + hop count
     // check if hop count valid
 
     size_t** table = lock_table(tbl);
-
+    size_t** newtable = lock_table(msg);
     // TODO: check if there are shorter routes
-
-    table[x][y] = cost;
-    table[y][x] = cost;
     
+    for(int i = 0; i < 4; ++i){
+ 	for(int j = 0; j < 4; ++j){
+    	    if(table[i][j] != newtable[i][j])
+    		table[i][j] = newtable[i][j];
+	}
+    }
+    unlock_table(msg);
     unlock_table(tbl);
 }
 

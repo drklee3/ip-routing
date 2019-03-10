@@ -34,6 +34,8 @@ CostTable* create_cost_table(FILE* fp, pthread_mutex_t* lock) {
     cost_table->lock  = lock;
     cost_table->table = table;
 
+    // TODO: initial hop count, doesn't have to be set?
+
     return cost_table;
 }
 

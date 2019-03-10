@@ -3,6 +3,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include "cost.h"
 #include "sender.h"
 #include "logger.h"
 #include "machine.h"
@@ -92,6 +93,7 @@ int send_cost(Machine* target, int* msg) {
 void send_costs(Config* cfg, int* msg) {
 
     // TODO: costs should only send table to neighbor nodes
+    // use received costtable's hop count + 1
 
     Machine* machines = cfg->machines;
     int curr_id = cfg->machine->id;

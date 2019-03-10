@@ -51,7 +51,7 @@ void* run_receiver(void* _cfg) {
         cfg.machine->id, cfg.machine->name, cfg.machine->ip, cfg.machine->port);
 
     // TODO: message received is the table of costs from neighbors along with
-    // hop count
+    // hop count, use CostTable in costs.h
 
     // response message [machine1, machine2, cost]
     int msg[3];

@@ -14,6 +14,8 @@ typedef struct {
     pthread_mutex_t* lock;
     // inner actual cost table
     size_t**         table;
+    // current hop count for receive/send
+    size_t           hop_count;
 } CostTable;
 
 size_t** parse_costs(FILE* fp);

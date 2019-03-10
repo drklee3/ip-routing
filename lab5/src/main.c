@@ -45,6 +45,7 @@ int main(int argc, char *argv[]) {
     log_debug("creating neighbor cost table");
     FILE* costs_fp = fopen(argv[3], "r");
     pthread_mutex_t table_lock;
+    // TODO: create_cost_table should know which machine currently on (curr_machine)
     CostTable* cost_table = create_cost_table(costs_fp, &table_lock);
 
     // check if cost table creation errored

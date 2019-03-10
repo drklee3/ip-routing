@@ -26,6 +26,8 @@ CostTable* create_cost_table(FILE* fp, pthread_mutex_t* lock) {
 
     size_t** table = parse_costs(fp);
 
+    // TODO: cost table should only start with neighbor distances
+
     // create table struct pointer
     CostTable* cost_table = malloc(sizeof(CostTable));
 
@@ -120,7 +122,12 @@ void update_costs(CostTable* tbl, int* msg) {
     int y    = msg[1];
     int cost = msg[2];
 
+    // TODO: message is cost table of neighbors + hop count
+    // check if hop count valid
+
     size_t** table = lock_table(tbl);
+
+    // TODO: check if there are shorter routes
 
     table[x][y] = cost;
     table[y][x] = cost;

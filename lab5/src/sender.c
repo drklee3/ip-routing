@@ -90,6 +90,9 @@ int send_cost(Machine* target, int* msg) {
  * @param msg Message to send
  */
 void send_costs(Config* cfg, int* msg) {
+
+    // TODO: costs should only send table to neighbor nodes
+
     Machine* machines = cfg->machines;
     int curr_id = cfg->machine->id;
     // send the message to all **other** nodes

@@ -53,7 +53,7 @@ void receive_update(Config* cfg, CostTable* cost_table) {
 
     // increase hop count
     cfg->costs->hop_count += 1;
-    // update_costs(cfg->costs, cfg->costs);
+    update_costs(cfg->costs, cost_table);
     
     send_costs(cfg, cfg->costs);
 }

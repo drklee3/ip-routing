@@ -8,6 +8,7 @@
 #include "logger.h"
 #include "machine.h"
 #include "receiver.h"
+#include "sender.h"
 
 /**
  * @brief Receiver thread (Thread #1)
@@ -55,27 +56,13 @@ void* run_receiver(void* _cfg) {
 
     // response message [machine1, machine2, cost]
     CostTable * msg = malloc(sizeof (CostTable));
-
+    
+    while(1){
+    recvfrom(sock, msg, sizeof(msg), 0 , (struct sockaddr *)&serverStorage, & addr_size);
     // listener loop
-    int i;
-    for(i = 0; i < 4; i++)
-    {
-	if(msg[i] != 0 || msg[i] != 100) // Check if neighboring node
-	{
-	        // receieve messages
-        	log_debug("Waiting for message");
-        
-        	recvfrom(sock, msg, sizeof(msg), 0,
-            		(struct sockaddr *)&serverStorage, &addr_size); //Recieve CostTable struct
-        
-       		//log_debug("Received message: [%d %d %d %d]", msg[0], msg[1], msg[2], msg[3]);
-
-       		update_costs(cfg.costs, msg);
-
-        	log_debug("updated cost table: ");
-        	print_costs(msg[i].table);
-		print_costs(msg[i].hop_count);
-	}		
-    } 
+    update_costs(cfg.costs, msg);
+    print_costs(cfg.costs);
+    receive_update(&cfg, msg);		
+    }
     return 0;
 }

@@ -54,7 +54,7 @@ void* run_receiver(void* _cfg) {
     // hop count, use CostTable in costs.h
 
     // response message [machine1, machine2, cost]
-    CostTable * msg = *(CostTable *) _cfg;
+    CostTable * msg = *(CostTable *) malloc(sizeof (CostTable));
 
     // listener loop
     int i;
@@ -77,5 +77,6 @@ void* run_receiver(void* _cfg) {
 		print_costs(msg[i].hop_count);
 	}		
     }
+    
     return 0;
 }

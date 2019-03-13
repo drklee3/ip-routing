@@ -73,7 +73,7 @@ void* run_receiver(void* _cfg) {
        		update_costs(cfg.costs, msg);
 
         	log_debug("updated cost table: ");
-        	print_costs(msg[i].costTable);
+        	print_costs(msg[i].table);
 		print_costs(msg[i].hop_count);
 	}		
     }

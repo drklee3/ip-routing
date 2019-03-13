@@ -33,6 +33,11 @@ void read_changes(Config* cfg) {
         log_info("updating machine %d <-> %d with new cost %d",
             cfg->machine->id, target, new_cost);
 
+	size_t** table = lock_table(cfg->costs);
+	table[cfg->machine->id][target] = new_cost;
+	table[target][cfg->machine->id] = new_cost;
+	unlock_table(cfg->costs);
+	
         // source, start at hop count 0
         // (increments in receive_update so start at -1 here)
         cfg->costs->hop_count = -1;

@@ -20,7 +20,7 @@ void read_changes(Config* cfg) {
 
         int target;
         int new_cost;
-        printf("Enter <id> <new_cost>: ");
+        printf("Enter <id> <new_cost>(Current Machine: %d):  ", cfg->machine->id);
         fflush(stdout);
 
         scanf("%d %d", &target, &new_cost);

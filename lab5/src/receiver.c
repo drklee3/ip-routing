@@ -54,22 +54,28 @@ void* run_receiver(void* _cfg) {
     // hop count, use CostTable in costs.h
 
     // response message [machine1, machine2, cost]
-    int msg[3];
+    CostTable * msg = *(CostTable *) _cfg;
 
     // listener loop
-    while (!cfg.shutdown) {
-        // receieve messages
-        log_debug("Waiting for message");
+    int i;
+    for(i = 0; i < 4; i++)
+    {
+	if(msg[i] != 0 || msg[i] != 100) // Check if neighboring node
+	{
+	        // receieve messages
+        	log_debug("Waiting for message");
         
-        recvfrom(sock, msg, sizeof(msg), 0,
-            (struct sockaddr *)&serverStorage, &addr_size);
+        	recvfrom(sock, msg, sizeof(msg), 0,
+            		(struct sockaddr *)&serverStorage, &addr_size); //Recieve CostTable struct
         
-        log_debug("Received message: [%d %d %d]", msg[0], msg[1], msg[2]);
+       		//log_debug("Received message: [%d %d %d %d]", msg[0], msg[1], msg[2], msg[3]);
 
-        update_costs(cfg.costs, msg);
-        log_debug("updated cost table: ");
-        print_costs(cfg.costs);
+       		update_costs(cfg.costs, msg);
+
+        	log_debug("updated cost table: ");
+        	print_costs(msg[i].costTable);
+		print_costs(msg[i].hop_count);
+	}		
     }
-
     return 0;
 }

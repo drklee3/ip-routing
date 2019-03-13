@@ -40,5 +40,6 @@ typedef struct {
 Config* create_config(Machine* machines, Machine* machine, CostTable* costs_tbl);
 Machine* parse_machines(FILE* fp);
 void print_machines(Machine* machines);
+size_t* get_neighbors(Config* cfg);
 
 #endif

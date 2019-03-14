@@ -58,11 +58,16 @@ void* run_receiver(void* _cfg) {
     CostTable * msg = malloc(sizeof (CostTable));
     
     while(1){
-    recvfrom(sock, msg, sizeof(msg), 0 , (struct sockaddr *)&serverStorage, & addr_size);
-    // listener loop
-    update_costs(cfg.costs, msg);
-    print_costs(cfg.costs);
-    receive_update(&cfg, msg);		
+        log_debug("waiting for message");
+        recvfrom(sock, msg, sizeof(msg), 0 , (struct sockaddr *)&serverStorage, & addr_size);
+        log_debug("received message, updating costs");
+        // listener loop
+
+        update_costs(cfg.costs, msg);
+        log_debug("updated costs, printing costs");
+        print_costs(cfg.costs);
+        log_debug("trigger update to neighbors");
+        receive_update(&cfg, msg);
     }
     return 0;
 }

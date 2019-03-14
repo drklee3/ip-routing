@@ -16,7 +16,7 @@
 void read_changes(Config* cfg) {
     // loop only 2 times?
     for (int i = 0; i < 2; ++i) {
-        sleep(10);
+        // sleep(10);
 
         int target;
         int new_cost;
@@ -40,7 +40,7 @@ void read_changes(Config* cfg) {
 	
         // source, start at hop count 0
         // (increments in receive_update so start at -1 here)
-        cfg->costs->hop_count = -1;
+        cfg->costs->hop_count = 0;
         receive_update(cfg, cfg->costs);
     }
 
@@ -50,14 +50,18 @@ void read_changes(Config* cfg) {
 
 
 void receive_update(Config* cfg, CostTable* cost_table) {
+    log_debug("current hop count: %d", cfg->costs->hop_count);
 
     // check if hop limit exceeded
     if (cfg->costs->hop_count > 8) {
+        log_debug("hop limit exceeded, not sending to other nodes");
         return;
     }
 
     // increase hop count
     cfg->costs->hop_count += 1;
+
+    log_debug("incrementing hop count to  %d", cfg->costs->hop_count);
     update_costs(cfg->costs, cost_table);
     
     send_costs(cfg, cfg->costs);
@@ -115,16 +119,19 @@ void send_costs(Config* cfg, CostTable* cost_table) {
 
     Machine* machines = cfg->machines;
     int curr_id = cfg->machine->id;
+    log_debug("sending costs to other machines");
     // send the message to all **other** nodes
     for (int i = 0; i < 4; ++i) {
         // skip current machine
         if (i == curr_id) {
+            log_debug("skipping own machine");
             continue;
         }
 
         size_t** table = lock_table(cost_table);
         // skip machines that aren't neighbors
         if (table[i][curr_id] >= 100) {
+            log_debug("skipping non-neighbor");
             continue;
         }
 

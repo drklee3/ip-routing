@@ -125,7 +125,7 @@ void update_costs(CostTable* tbl, CostTable* msg) {
     // check if hop count valid
 
     size_t** table = lock_table(tbl);
-    size_t** newtable = lock_table(msg);
+    size_t** newtable = msg->table;
     // TODO: check if there are shorter routes
     
     for(int i = 0; i < 4; ++i){
@@ -134,7 +134,6 @@ void update_costs(CostTable* tbl, CostTable* msg) {
     		table[i][j] = newtable[i][j];
 	}
     }
-    unlock_table(msg);
     unlock_table(tbl);
 }
 

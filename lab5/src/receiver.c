@@ -51,17 +51,18 @@ void* run_receiver(void* _cfg) {
     log_info("Machine [%d] %s listening on %s:%d",
         cfg.machine->id, cfg.machine->name, cfg.machine->ip, cfg.machine->port);
 
-    // TODO: message received is the table of costs from neighbors along with
-    // hop count, use CostTable in costs.h
-
-    // response message [machine1, machine2, cost]
-    CostTable * msg = malloc(sizeof (CostTable));
+    CostTableCopy* msg_copy = malloc(sizeof(CostTableCopy));
+    CostTable* msg = malloc(sizeof(CostTable));
     
-    while(1){
+    while(1) {
         log_debug("waiting for message");
-        recvfrom(sock, msg, sizeof(msg), 0 , (struct sockaddr *)&serverStorage, & addr_size);
-        log_debug("received message, updating costs");
-        // listener loop
+        log_debug("%zd", sizeof(*msg_copy));
+        size_t res = recvfrom(sock, msg_copy, sizeof(*msg_copy), 0, (struct sockaddr *)&serverStorage, & addr_size);
+        log_debug("received message size %zd, updating costs", res);
+
+        log_debug("test %d", msg_copy->table[0][0]);
+
+        msg = cost_table_from_copy(msg_copy);
 
         update_costs(cfg.costs, msg);
         log_debug("updated costs, printing costs");

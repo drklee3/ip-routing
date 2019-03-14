@@ -33,13 +33,12 @@ void read_changes(Config* cfg) {
         log_info("updating machine %d <-> %d with new cost %d",
             cfg->machine->id, target, new_cost);
 
-	size_t** table = lock_table(cfg->costs);
-	table[cfg->machine->id][target] = new_cost;
-	table[target][cfg->machine->id] = new_cost;
-	unlock_table(cfg->costs);
-	
+        size_t** table = lock_table(cfg->costs);
+        table[cfg->machine->id][target] = new_cost;
+        table[target][cfg->machine->id] = new_cost;
+        unlock_table(cfg->costs);
+
         // source, start at hop count 0
-        // (increments in receive_update so start at -1 here)
         cfg->costs->hop_count = 0;
         receive_update(cfg, cfg->costs);
     }
@@ -93,8 +92,8 @@ int send_cost(Machine* target, CostTable* cost_table) {
         return 0;
     }
 
-    log_info("sending message to machine #%d (hop count %d)",
-        target->id, cost_table->hop_count);
+    log_info("sending message to machine #%d (hop count %d) %zd",
+        target->id, cost_table->hop_count, cost_table->table);
 
     if (sendto(sock, cost_table, sizeof(CostTable), 0,
         (struct sockaddr*) &serverAddr, addr_size) == -1) {

@@ -128,14 +128,40 @@ void update_costs(CostTable* tbl, CostTable* msg) {
     size_t** newtable = msg->table;
     // TODO: check if there are shorter routes
     
-    for(int i = 0; i < 4; ++i){
- 	for(int j = 0; j < 4; ++j){
-    	    if(table[i][j] != newtable[i][j])
-    		table[i][j] = newtable[i][j];
-	}
+    log_debug("table %zd msg %zd hop %zd", table, newtable, msg->hop_count);
+    for (int i = 0; i < 4; ++i) {
+        log_debug("i %d", i);
+        for (int j = 0; j < 4; ++j) {
+            log_debug("j %d", j);
+            if (table[i][j] != newtable[i][j]) {
+                table[i][j] = newtable[i][j];
+            }
+        }
     }
     unlock_table(tbl);
 }
+
+CostTable* cost_table_from_copy(CostTableCopy* cpy) {
+    CostTable* tbl = malloc(sizeof(CostTable));
+    tbl->table = (size_t**) cpy->table;
+    tbl->hop_count = cpy->hop_count;
+
+    return tbl;
+}
+
+CostTableCopy* cost_table_to_copy(CostTable* tbl) {
+    size_t** inner_tbl = lock_table(tbl);
+    CostTableCopy* cpy = malloc(sizeof(CostTableCopy));
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            cpy->table[i][j] = inner_tbl[i][j];
+        }
+    }
+    cpy->hop_count = tbl->hop_count;
+
+    return cpy;
+}
+
 
 /**
  * @brief Gets the index of closet machine
